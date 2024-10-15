@@ -1,23 +1,21 @@
 ESX = exports[“es_extended”]:getSharedObject()
 
-
-RegisterNetEvent('ks-spray:useSprayCan', function()
-    ESX.TriggerServerCallback('ks-spray:hasSprayCan', function(hasSprayCan)
-        if hasSprayCan then
-          
-            local input = lib.inputDialog('Spray Text', {
-                { type = 'input', label = 'Enter text to spray', placeholder = 'Your message here...' }
+RegisterNetEvent('ks-spray:useSpray', function()
+    ESX.TriggerServerCallback('ks-spray:hasSpray', function(hasSpray)
+        if hasSpray then
+           
+            local input = lib.inputDialog('Enter Spray Text', {
+                { type = 'input', label = 'Spray Text', placeholder = 'Your message here...' }
             })
 
-            
+           
             if input and input[1] ~= '' then
-                
-                TriggerEvent('ks-spray:startSpray', input[1])
+                TriggerEvent('ks-spray:startSpray', input[1]) 
             else
                 lib.notify({ type = 'error', description = 'You must enter a valid text to spray!' })
             end
         else
-            lib.notify({ type = 'error', description = 'You need a spray can to do this.' })
+            lib.notify({ type = 'error', description = 'You need a spray to do this.' })
         end
     end)
 end)
@@ -29,7 +27,10 @@ RegisterNetEvent('ks-spray:startSpray', function(sprayText)
             label = "Spray Here",
             distance = 2.0,
             icon = 'paint-brush',
-            onSelect = function(data)
+            onSelect = function(entity)
+                local coords = GetEntityCoords(entity)
+                
+             
                 lib.progressBar({
                     duration = 5000,
                     label = 'Spraying...',
@@ -41,8 +42,9 @@ RegisterNetEvent('ks-spray:startSpray', function(sprayText)
                 }).next(function(success)
                     if success then
                         lib.notify({ type = 'success', description = 'Spray completed!' })
-                        TriggerServerEvent('ks-spray:removeSprayCan')
-                        TriggerServerEvent('ks-spray:displaySprayText', sprayText, GetEntityCoords(PlayerPedId()))
+                    
+                        TriggerServerEvent('ks-spray:removeSpray')
+                        TriggerServerEvent('ks-spray:displaySprayText', sprayText, coords, entity)
                     else
                         lib.notify({ type = 'inform', description = 'Spray cancelled.' })
                     end
@@ -53,21 +55,33 @@ RegisterNetEvent('ks-spray:startSpray', function(sprayText)
 end)
 
 
-RegisterNetEvent('ks-spray:showSprayText', function(sprayText, coords)
+RegisterNetEvent('ks-spray:showSprayText', function(sprayText, coords, entity, sprayId)
     Citizen.CreateThread(function()
-        local endTime = GetGameTimer() + 3000000
-        while GetGameTimer() < endTime do
-            DrawText3D(coords, sprayText)
-            Wait(0)
+        local removeTime = GetGameTimer() + 3600000 
+
+        while true do
+            if GetGameTimer() > removeTime then
+              
+                TriggerServerEvent('ks-spray:removeSprayText', sprayId)
+                break
+            end
+
+           
+            if DoesEntityExist(entity) then
+                DrawTextOnObject(entity, sprayText)
+            end
+            Citizen.Wait(0)
         end
     end)
 end)
 
 
-function DrawText3D(coords, text)
-    local x, y, z = table.unpack(coords)
-    local onScreen, _x, _y = World3dToScreen2d(x, y, z)
+function DrawTextOnObject(entity, text)
+    local entityCoords = GetEntityCoords(entity)
+    local forwardVector = GetEntityForwardVector(entity)
+    local textCoords = entityCoords + forwardVector * 0.5
     local scale = 0.35
+    local onScreen, _x, _y = World3dToScreen2d(textCoords.x, textCoords.y, textCoords.z)
     SetTextScale(scale, scale)
     SetTextFont(4)
     SetTextProportional(1)
@@ -76,3 +90,5 @@ function DrawText3D(coords, text)
     AddTextComponentString(text)
     DrawText(_x, _y)
 end
+
+
