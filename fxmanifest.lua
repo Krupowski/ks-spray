@@ -14,6 +14,10 @@ server_scripts {
     'server/main.lua'
 }
 
+shared_script {
+'@es_extended/imports.lua'
+}
+
 dependencies {
     'es_extended',
     'ox_lib',
