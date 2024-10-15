@@ -3,7 +3,7 @@ ESX = exports[“es_extended”]:getSharedObject()
 
 ESX.RegisterServerCallback('ks-spray:hasSprayCan', function(source, cb)
     local xPlayer = ESX.GetPlayerFromId(source)
-    local sprayCan = xPlayer.getInventoryItem('spray_can')
+    local sprayCan = xPlayer.getInventoryItem('spray')
 
     if sprayCan and sprayCan.count > 0 then
         cb(true)
@@ -15,7 +15,7 @@ end)
 
 RegisterNetEvent('ks-spray:removeSprayCan', function()
     local xPlayer = ESX.GetPlayerFromId(source)
-    xPlayer.removeInventoryItem('spray_can', 1)
+    xPlayer.removeInventoryItem('spray', 1)
 end)
 
 
