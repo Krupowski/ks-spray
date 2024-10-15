@@ -1,14 +1,16 @@
 ESX = exports[“es_extended”]:getSharedObject()
 
+local duiObject = nil
+
 RegisterNetEvent('ks-spray:useSpray', function()
     ESX.TriggerServerCallback('ks-spray:hasSpray', function(hasSpray)
         if hasSpray then
-           
+            
             local input = lib.inputDialog('Enter Spray Text', {
                 { type = 'input', label = 'Spray Text', placeholder = 'Your message here...' }
             })
 
-           
+            
             if input and input[1] ~= '' then
                 TriggerEvent('ks-spray:startSpray', input[1]) 
             else
@@ -29,8 +31,8 @@ RegisterNetEvent('ks-spray:startSpray', function(sprayText)
             icon = 'paint-brush',
             onSelect = function(entity)
                 local coords = GetEntityCoords(entity)
+
                 
-             
                 lib.progressBar({
                     duration = 5000,
                     label = 'Spraying...',
@@ -42,9 +44,13 @@ RegisterNetEvent('ks-spray:startSpray', function(sprayText)
                 }).next(function(success)
                     if success then
                         lib.notify({ type = 'success', description = 'Spray completed!' })
-                    
+
+                        
                         TriggerServerEvent('ks-spray:removeSpray')
                         TriggerServerEvent('ks-spray:displaySprayText', sprayText, coords, entity)
+
+                        
+                        createTextDUI(sprayText, coords)
                     else
                         lib.notify({ type = 'inform', description = 'Spray cancelled.' })
                     end
@@ -55,40 +61,25 @@ RegisterNetEvent('ks-spray:startSpray', function(sprayText)
 end)
 
 
-RegisterNetEvent('ks-spray:showSprayText', function(sprayText, coords, entity, sprayId)
-    Citizen.CreateThread(function()
-        local removeTime = GetGameTimer() + 3600000 
+function createTextDUI(text, coords)
+    local htmlCode = string.format([[
+        <html>
+        <body style="margin: 0; background: transparent;">
+            <div style="font-size: 50px; color: white;">%s</div>
+        </body>
+        </html>
+    ]], text)
 
-        while true do
-            if GetGameTimer() > removeTime then
-              
-                TriggerServerEvent('ks-spray:removeSprayText', sprayId)
-                break
-            end
+    
+    duiObject = CreateDui(htmlCode, 512, 512) 
 
-           
-            if DoesEntityExist(entity) then
-                DrawTextOnObject(entity, sprayText)
-            end
-            Citizen.Wait(0)
-        end
-    end)
-end)
+    
+    local duiHandle = GetDuiHandle(duiObject)
+    local texture = CreateRuntimeTextureFromDuiHandle(duiHandle, "text_texture")
 
-
-function DrawTextOnObject(entity, text)
-    local entityCoords = GetEntityCoords(entity)
-    local forwardVector = GetEntityForwardVector(entity)
-    local textCoords = entityCoords + forwardVector * 0.5
-    local scale = 0.35
-    local onScreen, _x, _y = World3dToScreen2d(textCoords.x, textCoords.y, textCoords.z)
-    SetTextScale(scale, scale)
-    SetTextFont(4)
-    SetTextProportional(1)
-    SetTextEntry("STRING")
-    SetTextCentre(1)
-    AddTextComponentString(text)
-    DrawText(_x, _y)
+    
+    DrawSprite("text_texture", "default", coords.x, coords.y, 0.1, 0.1, 0.0, 255, 255, 255, 255)
 end
+
 
 
