@@ -25,7 +25,7 @@ RegisterNetEvent('ks-spray:displaySprayText', function(sprayText, coords, entity
     local sprayId = #sprayData + 1 
     sprayData[sprayId] = {text = sprayText, coords = coords, entity = entity}
 
-   
+    
     TriggerClientEvent('ks-spray:showSprayText', -1, sprayText, coords, entity, sprayId)
 end)
 
@@ -52,4 +52,5 @@ ESX.RegisterServerCallback('ks-spray:getNearbySpray', function(source, cb)
 
     cb(nil) 
 end)
+
 
