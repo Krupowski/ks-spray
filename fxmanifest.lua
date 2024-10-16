@@ -1,17 +1,17 @@
 fx_version 'bodacious'
 game 'gta5'
 
-author 'Krupowski Studio 
+author 'Krupowski Studio'
 description 'Boski skrypt na analne zabawy'
 version '2.0.0'
 
 client_scripts {
-    'client/main.lua'
+    'client.lua'
 }
 
 server_scripts {
     '@mysql-async/lib/MySQL.lua',
-    'server/main.lua'
+    'server.lua'
 }
 
 shared_script {
