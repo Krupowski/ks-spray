@@ -1,26 +1,28 @@
-fx_version 'bodacious'
+fx_version 'cerulean'
 game 'gta5'
 
 author 'Krupowski Studio'
 description 'Boski skrypt na analne zabawy'
 version '2.0.0'
 
+
 client_scripts {
-    'client.lua'
+    'client/main.lua',        
+    '@ox_lib/init.lua',       
 }
 
 server_scripts {
-    '@mysql-async/lib/MySQL.lua',
-    'server.lua'
+    'server/main.lua',        
+    '@oxmysql/lib/MySQL.lua', 
 }
 
-shared_script {
-'@es_extended/imports.lua'
-}
 
 dependencies {
-    'es_extended',
-    'ox_lib',
-    'ox_inventory',
-    'ox_target'
+    'es_extended',            
+    'ox_inventory',           
+    'ox_lib',                 
+    'oxmysql'              
 }
+
+
+lua54 'yes'
