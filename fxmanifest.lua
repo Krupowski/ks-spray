@@ -7,12 +7,12 @@ version '1.1.0'
 
 
 client_scripts {
-    'client/main.lua',        
+    'client.lua',        
     '@ox_lib/init.lua',       
 }
 
 server_scripts {
-    'server/main.lua',        
+    'server.lua',        
     '@oxmysql/lib/MySQL.lua', 
 }
 
